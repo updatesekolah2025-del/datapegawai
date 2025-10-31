@@ -893,7 +893,7 @@
       <div class="data-container">
        <div class="section-header">
         <h2 class="section-title">📖 Panduan Lengkap Sistem Data Guru</h2>
-        <div class="action-buttons"><button id="auto-fill-btn" class="action-btn warning" style="font-size: 16px; padding: 14px 24px;"> <span>🤖</span> ISI OTOMATIS FORM (UJI COBA) </button> <button id="upload-doc-btn" class="action-btn primary"> <span>📄</span> Upload Dokumen </button> <button id="test-connection-btn" class="action-btn success"> <span>🔗</span> Test Koneksi </button>
+        <div class="action-buttons"><button id="auto-fill-btn" class="action-btn warning" style="font-size: 16px; padding: 14px 24px;"> <span>🤖</span> ISI OTOMATIS FORM (UJI COBA) </button> <button id="upload-doc-btn" class="action-btn primary"> <span>📄</span> Upload Dokumen </button> <button id="test-connection-btn" class="action-btn success"> <span>🔗</span> Test Koneksi </button> <button id="debug-fetch-btn" class="action-btn warning"> <span>🐛</span> Debug Fetch </button> <button id="force-refresh-btn" class="action-btn primary"> <span>⚡</span> Force Refresh </button>
         </div>
        </div><!-- Upload Section -->
        <div style="background: #f0f9ff; padding: 20px; border-radius: 12px; border: 2px dashed #3b82f6; margin-bottom: 24px;">
@@ -981,7 +981,7 @@
          <li>Klik "Deploy" → "New deployment" → pilih "Web app"</li>
          <li>Set "Execute as: Me" dan "Who has access: Anyone"</li>
          <li>Copy URL deployment dan sistem sudah terhubung otomatis</li>
-         <li><strong>URL Aktif:</strong> <code>https://script.google.com/macros/s/AKfycbxB258Sm8XiPXo5bDO4UXsgNy2LxV-pjSloQ5-XYRv3QQYfrMC89IVEFTeGUvBYw2Uh/exec</code></li>
+         <li><strong>URL Aktif:</strong> <code>https://script.google.com/macros/s/AKfycbx3OiMI91HVfuThne4XmmMK0dE58uVP97UMrszf51bMkPUwz_U7kJFrAt5AJBF96Nlz/exec</code></li>
         </ol>
        </div>
        <div style="background: #1f2937; color: #f9fafb; padding: 20px; border-radius: 8px; font-family: 'Courier New', monospace; font-size: 12px; overflow-x: auto; margin-bottom: 16px;">
@@ -989,7 +989,7 @@
          // Google Apps Script Code untuk Sistem Data Guru
         </div>
         <pre id="gas-code-content" style="margin: 0; white-space: pre-wrap; line-height: 1.4;">// Google Apps Script untuk Data Pegawai Real-time - VERSI TERBARU
-// URL: https://script.google.com/macros/s/AKfycbxB258Sm8XiPXo5bDO4UXsgNy2LxV-pjSloQ5-XYRv3QQYfrMC89IVEFTeGUvBYw2Uh/exec
+// URL: https://script.google.com/macros/s/AKfycbx3OiMI91HVfuThne4XmmMK0dE58uVP97UMrszf51bMkPUwz_U7kJFrAt5AJBF96Nlz/exec
 // Sheet ID: 1WSr7jCeBuaEbMOQwU2Jl7e1uuJwlSABFRs4AnoEDQqU
 // Real-time sync dengan auto-refresh setiap 15 detik
 
@@ -1429,7 +1429,7 @@ function downloadTemplate() {
         }
 
         // Google Sheets Configuration - PERMANENT CONNECTION
-        const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxB258Sm8XiPXo5bDO4UXsgNy2LxV-pjSloQ5-XYRv3QQYfrMC89IVEFTeGUvBYw2Uh/exec';
+        const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx3OiMI91HVfuThne4XmmMK0dE58uVP97UMrszf51bMkPUwz_U7kJFrAt5AJBF96Nlz/exec';
         const SHEET_ID = '1WSr7jCeBuaEbMOQwU2Jl7e1uuJwlSABFRs4AnoEDQqU';
         const ADMIN_PASSWORD = 'Pembina241108@';
         
@@ -1557,150 +1557,245 @@ function downloadTemplate() {
             }
         }
 
-        // Google Sheets Integration - REAL-TIME SYNC
+        // Google Sheets Integration - ENHANCED REAL-TIME SYNC
         async function fetchDataFromGoogleSheets() {
             try {
-                // Force fresh data with cache busting
-                const requestUrl = `${GOOGLE_APPS_SCRIPT_URL}?action=getData&timestamp=${Date.now()}&sheetId=${SHEET_ID}&_=${Math.random()}&nocache=${Date.now()}`;
-                console.log('🔄 Fetching from:', requestUrl);
+                // Enhanced cache busting with multiple parameters
+                const timestamp = Date.now();
+                const randomId = Math.random().toString(36).substring(7);
+                const requestUrl = `${GOOGLE_APPS_SCRIPT_URL}?action=getData&sheetId=${SHEET_ID}&timestamp=${timestamp}&random=${randomId}&nocache=${timestamp}&bust=${Date.now()}`;
                 
-                // Method 1: Standard fetch with aggressive cache busting
+                console.log('🔄 Enhanced fetch from:', requestUrl);
+                console.log('📊 Current allData length:', allData.length);
+                
+                // Enhanced fetch with multiple fallback methods
                 let response;
+                let fetchMethod = 'unknown';
+                
                 try {
+                    // Method 1: Enhanced standard fetch
+                    fetchMethod = 'enhanced-standard';
                     response = await fetch(requestUrl, {
                         method: 'GET',
                         mode: 'cors',
                         cache: 'no-store',
+                        redirect: 'follow',
                         headers: {
-                            'Accept': 'application/json',
+                            'Accept': 'application/json, text/plain, */*',
                             'Content-Type': 'application/json',
                             'Cache-Control': 'no-cache, no-store, must-revalidate, max-age=0',
                             'Pragma': 'no-cache',
                             'Expires': '0',
-                            'If-Modified-Since': 'Thu, 01 Jan 1970 00:00:00 GMT'
+                            'If-Modified-Since': 'Thu, 01 Jan 1970 00:00:00 GMT',
+                            'X-Requested-With': 'XMLHttpRequest'
                         }
                     });
                 } catch (fetchError) {
-                    console.log('🔄 Standard fetch failed, trying alternative method...');
+                    console.log('🔄 Enhanced standard fetch failed, trying POST method...');
                     
-                    // Method 2: Try with different approach
-                    response = await fetch(requestUrl, {
-                        method: 'GET',
-                        cache: 'no-store',
-                        headers: {
-                            'Accept': '*/*',
-                            'Cache-Control': 'no-cache, no-store, must-revalidate',
-                            'Pragma': 'no-cache'
-                        }
-                    });
+                    try {
+                        // Method 2: POST method fallback
+                        fetchMethod = 'post-fallback';
+                        response = await fetch(GOOGLE_APPS_SCRIPT_URL, {
+                            method: 'POST',
+                            mode: 'cors',
+                            cache: 'no-store',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Accept': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                action: 'getData',
+                                sheetId: SHEET_ID,
+                                timestamp: timestamp,
+                                random: randomId
+                            })
+                        });
+                    } catch (postError) {
+                        console.log('🔄 POST method failed, trying simple GET...');
+                        
+                        // Method 3: Simple GET fallback
+                        fetchMethod = 'simple-get';
+                        const simpleUrl = `${GOOGLE_APPS_SCRIPT_URL}?action=getData&t=${timestamp}`;
+                        response = await fetch(simpleUrl, {
+                            method: 'GET',
+                            headers: {
+                                'Accept': 'application/json'
+                            }
+                        });
+                    }
                 }
 
+                console.log('📡 Response received via:', fetchMethod);
                 console.log('📡 Response status:', response.status);
+                console.log('📡 Response headers:', Object.fromEntries(response.headers.entries()));
 
                 if (!response.ok) {
                     const errorText = await response.text();
-                    console.error('❌ Response error text:', errorText);
-                    throw new Error(`HTTP ${response.status}: ${response.statusText} - ${errorText}`);
+                    console.error('❌ Response error text:', errorText.substring(0, 500));
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
                 }
 
                 const responseText = await response.text();
                 console.log('📄 Raw response length:', responseText.length);
+                console.log('📄 Raw response preview:', responseText.substring(0, 200));
                 
                 let result;
                 try {
                     result = JSON.parse(responseText);
                 } catch (parseError) {
                     console.error('❌ JSON parse error:', parseError);
-                    console.log('Raw response text:', responseText.substring(0, 500));
-                    throw new Error('Invalid JSON response from server');
+                    console.log('📄 Full response text:', responseText);
+                    
+                    // Try to extract JSON from HTML response (common with Google Apps Script)
+                    const jsonMatch = responseText.match(/\{.*\}/s);
+                    if (jsonMatch) {
+                        try {
+                            result = JSON.parse(jsonMatch[0]);
+                            console.log('✅ Extracted JSON from HTML response');
+                        } catch (extractError) {
+                            throw new Error('Cannot parse JSON from response');
+                        }
+                    } else {
+                        throw new Error('No JSON found in response');
+                    }
                 }
                 
-                console.log('📊 Parsed response data:', result);
+                console.log('📊 Parsed response:', result);
+                console.log('📊 Response status:', result.status);
+                console.log('📊 Response data length:', result.data ? result.data.length : 'no data');
                 
                 if (result.status === 'success') {
                     const sheetsData = result.data || [];
-                    console.log('✅ Data received from Google Sheets:', sheetsData.length, 'records');
+                    console.log('✅ SUCCESS: Data received from Google Sheets:', sheetsData.length, 'records');
                     
-                    // ALWAYS update connection status to success when we get valid response
+                    if (sheetsData.length > 0) {
+                        console.log('📋 Sample record:', sheetsData[0]);
+                        console.log('📋 Record keys:', Object.keys(sheetsData[0] || {}));
+                    }
+                    
+                    // FORCE connection status to success
                     isConnected = true;
                     lastSyncTime = new Date();
                     updateSyncIndicator(true);
                     
-                    // Check if data actually changed
-                    const dataChanged = sheetsData.length !== allData.length || 
-                        JSON.stringify(sheetsData) !== JSON.stringify(allData.map(item => {
-                            const {__backendId, ...rest} = item;
-                            return rest;
-                        }));
+                    // ALWAYS update data, even if it seems unchanged
+                    console.log('🔄 FORCING data update...');
                     
-                    if (dataChanged) {
-                        console.log('🔄 Data changed detected, updating displays...');
+                    // Process and normalize data
+                    const processedData = sheetsData.map((item, index) => {
+                        // Ensure all required fields exist
+                        const processedItem = {
+                            __backendId: item.__backendId || `gs_${timestamp}_${index}`,
+                            nama_lengkap: item.nama_lengkap || item['Nama Lengkap'] || '',
+                            nip: item.nip || item['NIP'] || '',
+                            nuptk: item.nuptk || item['NUPTK'] || '',
+                            nik: item.nik || item['NIK'] || '',
+                            tempat_lahir: item.tempat_lahir || item['Tempat Lahir'] || '',
+                            tanggal_lahir: item.tanggal_lahir || item['Tanggal Lahir'] || '',
+                            jenis_kelamin: item.jenis_kelamin || item['Jenis Kelamin'] || '',
+                            agama: item.agama || item['Agama'] || '',
+                            status_perkawinan: item.status_perkawinan || item['Status Perkawinan'] || '',
+                            alamat: item.alamat || item['Alamat'] || '',
+                            no_telepon: item.no_telepon || item['No Telepon'] || '',
+                            email: item.email || item['Email'] || '',
+                            sekolah: item.sekolah || item['Sekolah'] || '',
+                            status_kepegawaian: item.status_kepegawaian || item['Status Kepegawaian'] || '',
+                            jenis_ptk: item.jenis_ptk || item['Jenis PTK'] || '',
+                            pendidikan_terakhir: item.pendidikan_terakhir || item['Pendidikan Terakhir'] || '',
+                            jurusan: item.jurusan || item['Jurusan'] || '',
+                            tahun_lulus: item.tahun_lulus || item['Tahun Lulus'] || 0,
+                            bidang_studi_ijazah: item.bidang_studi_ijazah || item['Bidang Studi Ijazah'] || '',
+                            is_sertifikasi: item.is_sertifikasi || (item['Status Sertifikasi'] === 'Sudah Sertifikasi') || false,
+                            nomor_sertifikasi: item.nomor_sertifikasi || item['Nomor Sertifikasi'] || '',
+                            bidang_studi_sertifikasi: item.bidang_studi_sertifikasi || item['Bidang Studi Sertifikasi'] || '',
+                            nrg: item.nrg || item['NRG'] || '',
+                            tmt_sertifikasi: item.tmt_sertifikasi || item['TMT Sertifikasi'] || '',
+                            tmt_mengajar: item.tmt_mengajar || item['TMT Mengajar'] || '',
+                            mapel_diampu: item.mapel_diampu || item['Mata Pelajaran'] || '',
+                            sk_mengajar: item.sk_mengajar || item['SK Mengajar'] || '',
+                            tmt_sk_mengajar: item.tmt_sk_mengajar || item['TMT SK Mengajar'] || '',
+                            sk_gty: item.sk_gty || item['SK GTY'] || '',
+                            tmt_sk_gty: item.tmt_sk_gty || item['TMT SK GTY'] || '',
+                            sk_tugas_pertama: item.sk_tugas_pertama || item['SK Tugas Pertama'] || '',
+                            tmt_sk_tugas_pertama: item.tmt_sk_tugas_pertama || item['TMT SK Tugas Pertama'] || '',
+                            created_at: item.created_at || item.tanggal_input || item['Tanggal Input'] || new Date().toISOString(),
+                            last_updated: item.last_updated || item.terakhir_update || item['Terakhir Update'] || new Date().toISOString()
+                        };
                         
-                        // Update allData with fresh data from Google Sheets
-                        allData = sheetsData.map((item, index) => ({
-                            ...item,
-                            __backendId: item.__backendId || `gs_${Date.now()}_${index}`
-                        }));
-                        
-                        // Force immediate UI update
-                        updateAllDisplays();
-                        updateStats();
-                        
-                        // Show notification for data changes
-                        const previousCount = previousStats.total || 0;
-                        if (sheetsData.length !== previousCount) {
-                            showNotification(`📊 Data diperbarui: ${sheetsData.length} pegawai (sebelumnya ${previousCount})`, 'success');
-                        }
-                        
-                        // Sync with Data SDK in background
-                        if (window.dataSdk) {
-                            syncWithDataSDK(sheetsData);
-                        }
-                    } else {
-                        console.log('📊 No data changes detected - connection still OK');
-                        // Even if no data changed, show periodic success notification
-                        if (Math.random() < 0.1) { // 10% chance to show sync success
-                            showNotification(`✅ Sync berhasil - ${sheetsData.length} data terbaru`, 'success');
-                        }
+                        return processedItem;
+                    });
+                    
+                    // Update allData with processed data
+                    const previousLength = allData.length;
+                    allData = processedData;
+                    
+                    console.log('📊 Data updated:', {
+                        previous: previousLength,
+                        current: allData.length,
+                        change: allData.length - previousLength
+                    });
+                    
+                    // FORCE UI update
+                    console.log('🎨 FORCING UI update...');
+                    updateAllDisplays();
+                    updateStats();
+                    
+                    // Show success notification
+                    const changeText = allData.length !== previousLength ? 
+                        `${allData.length} pegawai (${allData.length > previousLength ? '+' : ''}${allData.length - previousLength})` : 
+                        `${allData.length} pegawai`;
+                    
+                    showNotification(`✅ Data berhasil dimuat: ${changeText}`, 'success');
+                    
+                    // Sync with Data SDK if available
+                    if (window.dataSdk && processedData.length > 0) {
+                        console.log('🔄 Syncing with Data SDK...');
+                        syncWithDataSDK(processedData);
                     }
                     
-                    return sheetsData;
+                    return processedData;
+                    
                 } else {
-                    // Even if result status is not success, but we got a response, connection is working
+                    // Even with error status, if we got a response, connection is working
                     isConnected = true;
                     updateSyncIndicator(true);
-                    console.log('⚠️ Server responded but with error status:', result.message);
                     
-                    // Don't show error notification for server-side errors if connection is working
-                    if (Math.random() < 0.2) { // Only show occasionally
-                        showNotification('⚠️ Server response: ' + (result.message || 'Unknown error'), 'warning');
-                    }
+                    const errorMsg = result.message || 'Unknown server error';
+                    console.log('⚠️ Server error but connection OK:', errorMsg);
+                    
+                    // Show server error but keep connection active
+                    showNotification(`⚠️ Server: ${errorMsg}`, 'warning');
                     
                     return allData; // Return existing data
                 }
                 
             } catch (error) {
-                console.error('❌ Error fetching data:', error);
+                console.error('❌ Fetch error details:', {
+                    message: error.message,
+                    stack: error.stack,
+                    name: error.name
+                });
                 
-                // Only mark as disconnected for actual network/connection errors
-                if (error.message.includes('Failed to fetch') || 
-                    error.message.includes('NetworkError') || 
-                    error.message.includes('TypeError')) {
+                // Determine if this is a real connection error
+                const isNetworkError = error.message.includes('Failed to fetch') || 
+                                     error.message.includes('NetworkError') || 
+                                     error.message.includes('TypeError: fetch') ||
+                                     error.name === 'TypeError';
+                
+                if (isNetworkError) {
+                    console.log('🔌 Real network error detected');
                     isConnected = false;
                     updateSyncIndicator(false);
-                    
-                    // Show error notification only for real connection failures
-                    if (Math.random() < 0.3) { // Show less frequently
-                        showNotification('⚠️ Koneksi terputus, mencoba reconnect...', 'warning');
-                    }
+                    showNotification('❌ Koneksi terputus - mencoba reconnect...', 'error');
                 } else {
-                    // For parsing errors or other issues, keep connection as working
+                    console.log('⚠️ Non-network error - keeping connection active');
                     isConnected = true;
                     updateSyncIndicator(true);
-                    console.log('🔄 Non-critical error, keeping connection active');
+                    showNotification(`⚠️ Error: ${error.message}`, 'warning');
                 }
                 
-                return allData; // Return existing data instead of empty array
+                return allData; // Always return existing data
             }
         }
 
@@ -2457,6 +2552,13 @@ function downloadTemplate() {
             fileUpload?.addEventListener('change', handleFileSelection);
             testConnectionBtn?.addEventListener('click', manualTestConnection);
             
+            // Debug buttons
+            const debugFetchBtn = document.getElementById('debug-fetch-btn');
+            const forceRefreshBtn = document.getElementById('force-refresh-btn');
+            
+            debugFetchBtn?.addEventListener('click', debugFetch);
+            forceRefreshBtn?.addEventListener('click', forceRefresh);
+            
             // Data Pegawai section handlers
             const autoFillFormBtn = document.getElementById('auto-fill-form-btn');
             const clearFormBtn = document.getElementById('clear-form-btn');
@@ -3030,7 +3132,7 @@ function downloadTemplate() {
                     ['   - Periksa ejaan nama sekolah dan status'],
                     [''],
                     ['Sheet ID: 1WSr7jCeBuaEbMOQwU2Jl7e1uuJwlSABFRs4AnoEDQqU'],
-                    ['URL Apps Script: https://script.google.com/macros/s/AKfycbxB258Sm8XiPXo5bDO4UXsgNy2LxV-pjSloQ5-XYRv3QQYfrMC89IVEFTeGUvBYw2Uh/exec']
+                    ['URL Apps Script: https://script.google.com/macros/s/AKfycbx3OiMI91HVfuThne4XmmMK0dE58uVP97UMrszf51bMkPUwz_U7kJFrAt5AJBF96Nlz/exec']
                 ];
                 
                 const guideWs = XLSX.utils.aoa_to_sheet(guideData);
@@ -3127,7 +3229,7 @@ function downloadTemplate() {
             }
         }
 
-        // Manual Test Connection Function
+        // Enhanced Manual Test Connection Function
         async function manualTestConnection() {
             const testBtn = document.getElementById('test-connection-btn');
             const originalHTML = testBtn.innerHTML;
@@ -3138,89 +3240,232 @@ function downloadTemplate() {
                 
                 showNotification('🔗 Menguji koneksi ke Google Sheets...', 'success');
                 
-                const testUrl = `${GOOGLE_APPS_SCRIPT_URL}?action=ping&timestamp=${Date.now()}`;
-                console.log('🧪 Manual test URL:', testUrl);
+                // Enhanced test with detailed logging
+                console.log('🧪 ENHANCED MANUAL TEST STARTING...');
+                console.log('📍 Google Apps Script URL:', GOOGLE_APPS_SCRIPT_URL);
+                console.log('📊 Sheet ID:', SHEET_ID);
+                console.log('🌐 Current origin:', window.location.origin);
                 
-                const response = await fetch(testUrl, {
-                    method: 'GET',
-                    mode: 'cors',
-                    headers: {
-                        'Accept': 'application/json',
-                        'Cache-Control': 'no-cache'
-                    }
-                });
+                // Test multiple endpoints
+                const testResults = [];
                 
-                console.log('📡 Manual test response status:', response.status);
-                
-                if (response.ok) {
-                    const result = await response.json();
-                    console.log('📊 Manual test response:', result);
+                // Test 1: Ping endpoint
+                console.log('🧪 Test 1: Ping endpoint');
+                try {
+                    const pingUrl = `${GOOGLE_APPS_SCRIPT_URL}?action=ping&timestamp=${Date.now()}`;
+                    const pingResponse = await fetch(pingUrl, {
+                        method: 'GET',
+                        mode: 'cors',
+                        headers: {
+                            'Accept': 'application/json',
+                            'Cache-Control': 'no-cache'
+                        }
+                    });
                     
-                    // ALWAYS mark as connected if we get ANY valid response
+                    console.log('📡 Ping response status:', pingResponse.status);
+                    const pingText = await pingResponse.text();
+                    console.log('📄 Ping response text:', pingText.substring(0, 300));
+                    
+                    testResults.push({
+                        test: 'ping',
+                        status: pingResponse.status,
+                        ok: pingResponse.ok,
+                        text: pingText.substring(0, 100)
+                    });
+                } catch (pingError) {
+                    console.error('❌ Ping test failed:', pingError);
+                    testResults.push({
+                        test: 'ping',
+                        error: pingError.message
+                    });
+                }
+                
+                // Test 2: getData endpoint
+                console.log('🧪 Test 2: getData endpoint');
+                try {
+                    const dataUrl = `${GOOGLE_APPS_SCRIPT_URL}?action=getData&sheetId=${SHEET_ID}&timestamp=${Date.now()}`;
+                    const dataResponse = await fetch(dataUrl, {
+                        method: 'GET',
+                        mode: 'cors',
+                        headers: {
+                            'Accept': 'application/json',
+                            'Cache-Control': 'no-cache'
+                        }
+                    });
+                    
+                    console.log('📡 getData response status:', dataResponse.status);
+                    const dataText = await dataResponse.text();
+                    console.log('📄 getData response text:', dataText.substring(0, 300));
+                    
+                    // Try to parse JSON
+                    let parsedData = null;
+                    try {
+                        parsedData = JSON.parse(dataText);
+                        console.log('✅ JSON parsed successfully:', parsedData);
+                    } catch (parseError) {
+                        console.log('⚠️ JSON parse failed, trying extraction...');
+                        const jsonMatch = dataText.match(/\{.*\}/s);
+                        if (jsonMatch) {
+                            try {
+                                parsedData = JSON.parse(jsonMatch[0]);
+                                console.log('✅ JSON extracted from HTML:', parsedData);
+                            } catch (extractError) {
+                                console.error('❌ JSON extraction failed:', extractError);
+                            }
+                        }
+                    }
+                    
+                    testResults.push({
+                        test: 'getData',
+                        status: dataResponse.status,
+                        ok: dataResponse.ok,
+                        text: dataText.substring(0, 100),
+                        parsed: parsedData ? 'success' : 'failed',
+                        data: parsedData
+                    });
+                    
+                    // If we got valid data, update the display immediately
+                    if (parsedData && parsedData.status === 'success' && parsedData.data) {
+                        console.log('🎉 VALID DATA RECEIVED IN TEST!');
+                        console.log('📊 Data count:', parsedData.data.length);
+                        
+                        // Process the data immediately
+                        const processedData = parsedData.data.map((item, index) => ({
+                            __backendId: item.__backendId || `test_${Date.now()}_${index}`,
+                            nama_lengkap: item.nama_lengkap || item['Nama Lengkap'] || '',
+                            nip: item.nip || item['NIP'] || '',
+                            nuptk: item.nuptk || item['NUPTK'] || '',
+                            sekolah: item.sekolah || item['Sekolah'] || '',
+                            status_kepegawaian: item.status_kepegawaian || item['Status Kepegawaian'] || '',
+                            is_sertifikasi: item.is_sertifikasi || (item['Status Sertifikasi'] === 'Sudah Sertifikasi') || false,
+                            created_at: item.created_at || item.tanggal_input || new Date().toISOString(),
+                            // Add other fields as needed
+                            ...item
+                        }));
+                        
+                        // Update allData and force UI refresh
+                        allData = processedData;
+                        console.log('🔄 FORCING UI UPDATE FROM TEST...');
+                        updateAllDisplays();
+                        updateStats();
+                        
+                        // Mark as connected
+                        isConnected = true;
+                        updateSyncIndicator(true);
+                        
+                        testBtn.innerHTML = '<span>✅</span> Berhasil + Data Dimuat!';
+                        testBtn.style.background = 'linear-gradient(135deg, #10b981, #059669)';
+                        showNotification(`✅ Koneksi berhasil! ${processedData.length} data dimuat.`, 'success');
+                        
+                        setTimeout(() => {
+                            testBtn.innerHTML = originalHTML;
+                            testBtn.style.background = '';
+                        }, 5000);
+                        
+                        return true;
+                    }
+                    
+                } catch (dataError) {
+                    console.error('❌ getData test failed:', dataError);
+                    testResults.push({
+                        test: 'getData',
+                        error: dataError.message
+                    });
+                }
+                
+                // Test 3: POST method
+                console.log('🧪 Test 3: POST method');
+                try {
+                    const postResponse = await fetch(GOOGLE_APPS_SCRIPT_URL, {
+                        method: 'POST',
+                        mode: 'cors',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            action: 'getData',
+                            sheetId: SHEET_ID,
+                            timestamp: Date.now()
+                        })
+                    });
+                    
+                    console.log('📡 POST response status:', postResponse.status);
+                    const postText = await postResponse.text();
+                    console.log('📄 POST response text:', postText.substring(0, 300));
+                    
+                    testResults.push({
+                        test: 'POST',
+                        status: postResponse.status,
+                        ok: postResponse.ok,
+                        text: postText.substring(0, 100)
+                    });
+                } catch (postError) {
+                    console.error('❌ POST test failed:', postError);
+                    testResults.push({
+                        test: 'POST',
+                        error: postError.message
+                    });
+                }
+                
+                // Analyze results
+                console.log('📊 Test results summary:', testResults);
+                
+                const successfulTests = testResults.filter(r => r.ok || r.parsed === 'success');
+                const hasValidData = testResults.some(r => r.data && r.data.status === 'success');
+                
+                if (successfulTests.length > 0) {
                     isConnected = true;
                     updateSyncIndicator(true);
                     
-                    if (result.status === 'success') {
-                        testBtn.innerHTML = '<span>✅</span> Berhasil!';
+                    if (hasValidData) {
+                        testBtn.innerHTML = '<span>✅</span> Berhasil + Data!';
                         testBtn.style.background = 'linear-gradient(135deg, #10b981, #059669)';
-                        showNotification('✅ Koneksi berhasil! Google Sheets terhubung.', 'success');
-                        
-                        // Trigger data fetch
-                        fetchDataFromGoogleSheets();
-                        
-                        setTimeout(() => {
-                            testBtn.innerHTML = originalHTML;
-                            testBtn.style.background = '';
-                        }, 3000);
-                        
-                        return true;
+                        showNotification('✅ Koneksi berhasil dan data tersedia!', 'success');
                     } else {
-                        // Even if status is not success, connection is working
                         testBtn.innerHTML = '<span>⚠️</span> Terhubung';
                         testBtn.style.background = 'linear-gradient(135deg, #f59e0b, #d97706)';
-                        showNotification('⚠️ Terhubung tapi ada masalah server: ' + (result.message || 'Unknown'), 'warning');
-                        
-                        setTimeout(() => {
-                            testBtn.innerHTML = originalHTML;
-                            testBtn.style.background = '';
-                        }, 3000);
-                        
-                        return true; // Still return true because connection works
+                        showNotification('⚠️ Terhubung tapi belum ada data', 'warning');
                     }
-                }
-                
-                throw new Error('Response tidak valid dari server');
-                
-            } catch (error) {
-                console.error('❌ Manual test failed:', error);
-                
-                // Only mark as disconnected for real network errors
-                if (error.message.includes('Failed to fetch') || 
-                    error.message.includes('NetworkError')) {
+                    
+                    // Trigger full data fetch
+                    setTimeout(() => {
+                        console.log('🔄 Triggering full data fetch after test...');
+                        fetchDataFromGoogleSheets();
+                    }, 1000);
+                    
+                } else {
                     isConnected = false;
                     updateSyncIndicator(false);
                     
                     testBtn.innerHTML = '<span>❌</span> Gagal';
                     testBtn.style.background = 'linear-gradient(135deg, #dc2626, #b91c1c)';
-                    
-                    let errorMsg = 'Koneksi terputus: Tidak dapat terhubung ke server. Periksa URL Google Apps Script.';
-                    showNotification(`❌ ${errorMsg}`, 'error');
-                } else {
-                    // For other errors, keep connection as working
-                    isConnected = true;
-                    updateSyncIndicator(true);
-                    
-                    testBtn.innerHTML = '<span>⚠️</span> Terhubung';
-                    testBtn.style.background = 'linear-gradient(135deg, #f59e0b, #d97706)';
-                    showNotification('⚠️ Terhubung tapi ada masalah parsing: ' + error.message, 'warning');
+                    showNotification('❌ Semua test koneksi gagal', 'error');
                 }
+                
+                setTimeout(() => {
+                    testBtn.innerHTML = originalHTML;
+                    testBtn.style.background = '';
+                }, 5000);
+                
+                return isConnected;
+                
+            } catch (error) {
+                console.error('❌ Manual test completely failed:', error);
+                
+                isConnected = false;
+                updateSyncIndicator(false);
+                
+                testBtn.innerHTML = '<span>❌</span> Error';
+                testBtn.style.background = 'linear-gradient(135deg, #dc2626, #b91c1c)';
+                showNotification(`❌ Test error: ${error.message}`, 'error');
                 
                 setTimeout(() => {
                     testBtn.innerHTML = originalHTML;
                     testBtn.style.background = '';
                 }, 3000);
                 
-                return isConnected;
+                return false;
             } finally {
                 testBtn.disabled = false;
             }
@@ -3262,6 +3507,216 @@ function downloadTemplate() {
             }
         }
 
+        // Debug Functions
+        async function debugFetch() {
+            console.log('🐛 DEBUG FETCH STARTING...');
+            console.log('📊 Current state:', {
+                allDataLength: allData.length,
+                isConnected: isConnected,
+                lastSyncTime: lastSyncTime,
+                GOOGLE_APPS_SCRIPT_URL: GOOGLE_APPS_SCRIPT_URL,
+                SHEET_ID: SHEET_ID
+            });
+            
+            showNotification('🐛 Starting debug fetch...', 'success');
+            
+            try {
+                // Direct raw fetch test
+                const debugUrl = `${GOOGLE_APPS_SCRIPT_URL}?action=getData&sheetId=${SHEET_ID}&debug=true&timestamp=${Date.now()}`;
+                console.log('🔗 Debug URL:', debugUrl);
+                
+                const response = await fetch(debugUrl, {
+                    method: 'GET',
+                    mode: 'cors',
+                    headers: {
+                        'Accept': '*/*',
+                        'Cache-Control': 'no-cache'
+                    }
+                });
+                
+                console.log('📡 Debug response status:', response.status);
+                console.log('📡 Debug response headers:', Object.fromEntries(response.headers.entries()));
+                
+                const responseText = await response.text();
+                console.log('📄 Debug response length:', responseText.length);
+                console.log('📄 Debug response full text:', responseText);
+                
+                // Try to find and parse JSON
+                let jsonData = null;
+                try {
+                    jsonData = JSON.parse(responseText);
+                    console.log('✅ Direct JSON parse successful:', jsonData);
+                } catch (parseError) {
+                    console.log('⚠️ Direct JSON parse failed, trying extraction...');
+                    
+                    // Try different extraction methods
+                    const patterns = [
+                        /\{.*\}/s,
+                        /\{[\s\S]*\}/,
+                        /"status"[\s\S]*?\}/
+                    ];
+                    
+                    for (const pattern of patterns) {
+                        const match = responseText.match(pattern);
+                        if (match) {
+                            try {
+                                jsonData = JSON.parse(match[0]);
+                                console.log('✅ JSON extracted with pattern:', pattern, jsonData);
+                                break;
+                            } catch (extractError) {
+                                console.log('❌ Pattern failed:', pattern);
+                            }
+                        }
+                    }
+                }
+                
+                if (jsonData) {
+                    console.log('🎉 DEBUG: Valid JSON found!', jsonData);
+                    
+                    if (jsonData.status === 'success' && jsonData.data) {
+                        console.log('📊 DEBUG: Data array found with', jsonData.data.length, 'items');
+                        
+                        if (jsonData.data.length > 0) {
+                            console.log('📋 DEBUG: Sample item:', jsonData.data[0]);
+                            console.log('📋 DEBUG: Item keys:', Object.keys(jsonData.data[0]));
+                            
+                            // Process and display the data immediately
+                            const processedData = jsonData.data.map((item, index) => ({
+                                __backendId: item.__backendId || `debug_${Date.now()}_${index}`,
+                                nama_lengkap: item.nama_lengkap || item['Nama Lengkap'] || 'N/A',
+                                nip: item.nip || item['NIP'] || '',
+                                nuptk: item.nuptk || item['NUPTK'] || '',
+                                sekolah: item.sekolah || item['Sekolah'] || 'N/A',
+                                status_kepegawaian: item.status_kepegawaian || item['Status Kepegawaian'] || 'N/A',
+                                is_sertifikasi: item.is_sertifikasi || (item['Status Sertifikasi'] === 'Sudah Sertifikasi') || false,
+                                created_at: item.created_at || item.tanggal_input || item['Tanggal Input'] || new Date().toISOString(),
+                                ...item
+                            }));
+                            
+                            console.log('🔄 DEBUG: Processed data:', processedData);
+                            
+                            // Force update
+                            allData = processedData;
+                            updateAllDisplays();
+                            updateStats();
+                            
+                            isConnected = true;
+                            updateSyncIndicator(true);
+                            
+                            showNotification(`🐛 Debug berhasil! ${processedData.length} data dimuat`, 'success');
+                        } else {
+                            showNotification('🐛 Debug: Koneksi OK tapi data kosong', 'warning');
+                        }
+                    } else {
+                        showNotification(`🐛 Debug: Server error - ${jsonData.message || 'Unknown'}`, 'warning');
+                    }
+                } else {
+                    console.log('❌ DEBUG: No valid JSON found in response');
+                    showNotification('🐛 Debug: Tidak ada JSON valid dalam response', 'error');
+                }
+                
+            } catch (error) {
+                console.error('❌ DEBUG FETCH ERROR:', error);
+                showNotification(`🐛 Debug error: ${error.message}`, 'error');
+            }
+        }
+        
+        async function forceRefresh() {
+            console.log('⚡ FORCE REFRESH STARTING...');
+            showNotification('⚡ Force refresh dimulai...', 'success');
+            
+            try {
+                // Clear existing data
+                allData = [];
+                updateAllDisplays();
+                updateStats();
+                
+                // Show loading
+                showLoadingOverlay(true);
+                
+                // Multiple aggressive fetch attempts
+                const attempts = [
+                    // Attempt 1: Standard enhanced fetch
+                    () => fetchDataFromGoogleSheets(),
+                    
+                    // Attempt 2: Direct simple fetch
+                    async () => {
+                        const url = `${GOOGLE_APPS_SCRIPT_URL}?action=getData&t=${Date.now()}`;
+                        const response = await fetch(url);
+                        const text = await response.text();
+                        const data = JSON.parse(text);
+                        return data.data || [];
+                    },
+                    
+                    // Attempt 3: POST method
+                    async () => {
+                        const response = await fetch(GOOGLE_APPS_SCRIPT_URL, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ action: 'getData', sheetId: SHEET_ID })
+                        });
+                        const text = await response.text();
+                        const data = JSON.parse(text);
+                        return data.data || [];
+                    }
+                ];
+                
+                let successfulData = null;
+                
+                for (let i = 0; i < attempts.length; i++) {
+                    try {
+                        console.log(`⚡ Force refresh attempt ${i + 1}...`);
+                        const result = await attempts[i]();
+                        
+                        if (result && Array.isArray(result) && result.length > 0) {
+                            successfulData = result;
+                            console.log(`✅ Force refresh attempt ${i + 1} successful:`, result.length, 'items');
+                            break;
+                        } else if (result && Array.isArray(result)) {
+                            console.log(`⚠️ Force refresh attempt ${i + 1} returned empty array`);
+                            successfulData = result; // Keep empty array as valid result
+                        }
+                    } catch (attemptError) {
+                        console.log(`❌ Force refresh attempt ${i + 1} failed:`, attemptError.message);
+                    }
+                }
+                
+                if (successfulData !== null) {
+                    // Process successful data
+                    const processedData = successfulData.map((item, index) => ({
+                        __backendId: item.__backendId || `force_${Date.now()}_${index}`,
+                        nama_lengkap: item.nama_lengkap || item['Nama Lengkap'] || '',
+                        nip: item.nip || item['NIP'] || '',
+                        sekolah: item.sekolah || item['Sekolah'] || '',
+                        status_kepegawaian: item.status_kepegawaian || item['Status Kepegawaian'] || '',
+                        is_sertifikasi: item.is_sertifikasi || (item['Status Sertifikasi'] === 'Sudah Sertifikasi') || false,
+                        created_at: item.created_at || item.tanggal_input || new Date().toISOString(),
+                        ...item
+                    }));
+                    
+                    allData = processedData;
+                    updateAllDisplays();
+                    updateStats();
+                    
+                    isConnected = true;
+                    updateSyncIndicator(true);
+                    
+                    showNotification(`⚡ Force refresh berhasil! ${processedData.length} data dimuat`, 'success');
+                } else {
+                    throw new Error('Semua attempt gagal');
+                }
+                
+            } catch (error) {
+                console.error('❌ FORCE REFRESH ERROR:', error);
+                showNotification(`⚡ Force refresh gagal: ${error.message}`, 'error');
+                
+                isConnected = false;
+                updateSyncIndicator(false);
+            } finally {
+                showLoadingOverlay(false);
+            }
+        }
+
         // Start the application when DOM is ready
         document.addEventListener('DOMContentLoaded', initializeApp);
 
@@ -3275,5 +3730,5 @@ function downloadTemplate() {
             }
         });
     </script>
- <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'996f2f02f7055fc9',t:'MTc2MTg3MjA5Mi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'996f424ad0c50bfb',t:'MTc2MTg3Mjg4Mi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
